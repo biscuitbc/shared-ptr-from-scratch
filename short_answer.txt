@@ -1,37 +1,57 @@
-Shared Pointer Lab — 简答题（人工评价，不计入自动评分的 100 分）
-姓名：
+Shared Pointer Lab — Short Answers / 简答题
+Manually reviewed; separate from the automatic score of 100.
+人工评价，不计入自动评分的 100 分。
+Name / 姓名：
 
-Q1 [S1–S3] RAII 如何帮助异常路径释放资源？为什么引用计数必须由所有
+Q1 [S1–S3] How does RAII release resources during exception unwinding? Why must
+all handles in an ownership group share one counter instead of storing independent counts?
+RAII 如何帮助异常路径释放资源？为什么引用计数必须由所有
 共享同一对象的句柄共同访问，而不能是每个句柄独立的一份整数？
-STUDENT TODO:
+STUDENT TODO / 学生作答：
 
-Q2 [S2] 比较 shared_ptr<int>{}、shared_ptr<int>{nullptr} 和
+Q2 [S2] Compare get(), bool and use_count() for default construction, literal nullptr,
+and a typed null int*. Why is checking only the stored pointer insufficient during cleanup?
+比较 shared_ptr<int>{}、shared_ptr<int>{nullptr} 和
 shared_ptr<int>{static_cast<int*>(nullptr)} 的 get()、bool、use_count()。
 为什么只用 if (ptr) 判断是否需要处理控制块会出错？
-STUDENT TODO:
+STUDENT TODO / 学生作答：
 
-Q3 [S4–S5] 复制、移动、自复制、自移动、同组的不同句柄移动赋值，
+Q3 [S4–S5] How do copy, move, self-copy, self-move, and moving between distinct
+handles in one group affect counts? Does std::move itself move anything?
+复制、移动、自复制、自移动、同组的不同句柄移动赋值，
 分别如何影响计数？std::move 本身是否移动了对象？
-STUDENT TODO:
+STUDENT TODO / 学生作答：
 
-Q4 [S4–S6] 为什么先释放旧所有权，再读取 other，可能使 p = p->next
+Q4 [S4–S6] Why can releasing old ownership before reading other break p = p->next
+or p = std::move(p->next)? Describe a safe ordering of operations.
+为什么先释放旧所有权，再读取 other，可能使 p = p->next
 或 p = std::move(p->next) 访问已销毁的成员？描述安全的操作顺序。
-STUDENT TODO:
+STUDENT TODO / 学生作答：
 
-Q5 [S2, S6–S7] 对象 new 成功、控制块 new 失败时谁负责释放对象？
+Q5 [S2, S6–S7] Who cleans up if object allocation succeeds but block allocation fails?
+What guarantee must reset(new T(...)) provide? How do two allocations differ from
+the combined allocation commonly used by std::make_shared?
+对象 new 成功、控制块 new 失败时谁负责释放对象？
 reset(new T(...)) 要满足什么异常保证？本实验 make_shared 的两次分配
 与标准库常见的合并分配实现有什么差别？
-STUDENT TODO:
+STUDENT TODO / 学生作答：
 
-Q6 [S1] const shared_ptr<T> 与 shared_ptr<const T> 各自限制了什么？
+Q6 [S1] What do const shared_ptr<T> and shared_ptr<const T> each restrict?
+Why does operator*() const return int& when T is int?
+const shared_ptr<T> 与 shared_ptr<const T> 各自限制了什么？
 为什么 operator*() const 在 T=int 时返回 int&？
-STUDENT TODO:
+STUDENT TODO / 学生作答：
 
-Q7 [S8] 两条链表共享一个尾部时，哪些节点会在释放其中一条链表后
+Q7 [S8] Which nodes survive after releasing one of two lists with a shared tail?
+Draw the ownership relationships. Why does use_count not count reachable paths?
+两条链表共享一个尾部时，哪些节点会在释放其中一条链表后
 存活？请画出指针/所有权关系，并说明 use_count 不等于“可达路径数”。
-STUDENT TODO:
+STUDENT TODO / 学生作答：
 
-Q8 [扩展思考，不要求编码] 引用计数为什么无法自动回收环？weak_ptr
+Q8 [Discussion; no implementation required] Why cannot counting reclaim cycles?
+How does weak_ptr help? Why is this lab not thread-safe? What limitation can
+recursive destruction of a very long linked list encounter?
+[扩展思考，不要求编码] 引用计数为什么无法自动回收环？weak_ptr
 如何解决这个问题？本实验为什么不是线程安全的？递归析构很长的
 单链表还可能遇到什么限制？
-STUDENT TODO:
+STUDENT TODO / 学生作答：
