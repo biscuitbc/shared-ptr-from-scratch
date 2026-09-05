@@ -45,11 +45,12 @@ def main():
     require(tested.returncode == 0, "Framework regression failed / 框架回归失败")
     with tempfile.TemporaryDirectory(prefix="shared-ptr-verify-") as temporary:
         directory = Path(temporary)
-        code, report = grade_source(ROOT, args.cxx, False, directory / "starter.json")
-        require(code == 1 and report["score"] == 0 and report["max_score"] == 100,
-                "Starter must score 0/100 / 骨架应得 0/100")
-        require(all(t["status"] == "failed" and "STUDENT TODO" in t["output"] for t in report["tests"]),
-                "Every starter case must compile and reach a TODO / 骨架每项必须编译成功并报告 TODO")
+        for sanitized in (False, True):
+            code, report = grade_source(ROOT, args.cxx, sanitized, directory / "starter.json")
+            require(code == 1 and report["score"] == 0 and report["max_score"] == 100,
+                    "Starter must score 0/100 / 骨架应得 0/100")
+            require(all(t["status"] == "failed" and "STUDENT TODO" in t["output"] for t in report["tests"]),
+                    "Every starter case must compile and reach a TODO / 骨架每项必须编译成功并报告 TODO")
         demo = directory / "demo"
         compiled = execute([args.cxx, "-std=c++20", ROOT / "main.cpp", "-o", demo], 60, ROOT)
         require(compiled.ok, compiled.diagnostic())

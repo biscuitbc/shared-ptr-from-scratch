@@ -11,7 +11,7 @@ python3 instructor/verify.py
 python3 instructor/verify.py --solution /absolute/private-solution
 ```
 
-The first command checks the grader itself, ensures all 50 starter cases compile and reach a TODO, verifies the expected initial 0/100, and compiles the starter demo. Run it against the unmodified starter. Student implementations should use the regular grader instead.
+The first command checks the grader itself, ensures all 50 starter cases compile and reach a TODO in normal and sanitizer modes, verifies the expected initial 0/100, and compiles the starter demo. Run it against the unmodified starter. Student implementations should use the regular grader instead. GitHub Actions runs these checks and packaging on both GCC and Clang for pushes and pull requests; CI never needs a complete solution.
 
 The optional private directory contains only the instructor's `shared_ptr.h` and `main.cpp`. The second command additionally requires that implementation to score 100/100 both normally and with sanitizers, then checks the standalone demo's exact output. The tool rejects a solution directory within this repository. Private code is only copied into a temporary grading directory and is never committed, archived, or uploaded by these tools.
 
@@ -54,7 +54,7 @@ python3 instructor/verify.py
 python3 instructor/verify.py --solution /absolute/private-solution
 ```
 
-第一条命令检查评分器自身，确认初始 50 项均可编译且执行到 TODO，核对初始得分 0/100，并编译学生演示程序。它用于未修改的骨架，学生完成后的代码应使用普通评分器。
+第一条命令检查评分器自身，确认初始 50 项在普通和 sanitizer 模式下均可编译且执行到 TODO，核对初始得分 0/100，并编译学生演示程序。它用于未修改的骨架，学生完成后的代码应使用普通评分器。GitHub Actions 会在 push 和 pull request 时使用 GCC、Clang 执行这些检查及打包；CI 不需要完整解答。
 
 私有目录放置教师的 `shared_ptr.h` 和 `main.cpp`。第二条命令额外要求私有实现的普通模式与 sanitizer 模式都得 100/100，再检查独立演示程序的精确输出。工具拒绝使用仓库内部的解答目录。私有代码只复制到临时评分目录，这些工具不会提交、打包或上传它。
 

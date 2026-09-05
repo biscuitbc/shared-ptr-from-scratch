@@ -1,0 +1,26 @@
+name: Framework verification
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        compiler: [g++, clang++]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Verify starter and grader / 验证骨架和评分器
+        run: python3 instructor/verify.py --cxx "${{ matrix.compiler }}"
+      - name: Build student archive / 构建学生包
+        run: python3 instructor/package.py --output dist/shared-pointer-lab.zip
