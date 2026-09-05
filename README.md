@@ -92,7 +92,7 @@ python3 autograder/autograder.py
 python3 autograder/autograder.py --sanitize
 ```
 
-Pass both runs and complete the short answers. Tests cannot prove an arbitrary program correct; instructors also review compliance with the handwritten resource-management requirement. The [instructor guide](docs/instructor.md) explains reference verification, faulty-implementation regression tests, and student packaging.
+Pass both runs and complete the short answers. Tests cannot prove an arbitrary program correct; instructors also review compliance with the handwritten resource-management requirement. The [instructor guide](docs/instructor.md) explains reference verification, faulty-implementation regression tests, and student packaging. The [verification record](docs/verification.md) documents the framework checks already performed.
 
 ---
 
@@ -188,4 +188,4 @@ python3 autograder/autograder.py
 python3 autograder/autograder.py --sanitize
 ```
 
-两轮都应通过，并完成简答题。自动测试不能证明任意程序绝对正确；教师还会检查是否满足手写资源管理要求。[教师说明](docs/instructor.md)介绍了参考解验证、错误实现回归和学生包生成。
+两轮都应通过，并完成简答题。自动测试不能证明任意程序绝对正确；教师还会检查是否满足手写资源管理要求。[教师说明](docs/instructor.md)介绍了参考解验证、错误实现回归和学生包生成，[验证记录](docs/verification.md)列出了框架已完成的实测检查。

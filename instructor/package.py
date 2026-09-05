@@ -14,7 +14,7 @@ import zipfile
 ROOT = Path(__file__).resolve().parents[1]
 PUBLIC_FILES = (
     ".gitignore", "README.md", "Makefile", "shared_ptr.h", "main.cpp", "short_answer.txt",
-    "docs/spec.md", "docs/grading.md", "docs/instructor.md",
+    "docs/spec.md", "docs/grading.md", "docs/instructor.md", "docs/verification.md",
     "autograder/autograder.py", "autograder/cases.py", "autograder/memory.cpp",
     "autograder/memory.hpp", "autograder/test.hpp",
     "autograder/tests/basics.cpp", "autograder/tests/ownership.cpp",
