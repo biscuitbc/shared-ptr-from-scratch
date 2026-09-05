@@ -11,11 +11,12 @@ import shutil
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "autograder"))
-from autograder import (GraderError, OUTPUT_LIMIT, execute, positive_seconds,
+from autograder import (GraderError, Outcome, OUTPUT_LIMIT, execute, grade, positive_seconds,
                         select_cases, write_report)
 from cases import CASES, REJECTED_PROGRAMS
 from package import PUBLIC_FILES, package
@@ -48,6 +49,29 @@ class InventoryTests(unittest.TestCase):
             with self.subTest(value=value), self.assertRaises(argparse.ArgumentTypeError):
                 positive_seconds(value)
         self.assertEqual(positive_seconds("0.25"), 0.25)
+
+
+class ScoringTests(unittest.TestCase):
+    def arguments(self):
+        return argparse.Namespace(submission=ROOT, cxx=os.environ.get("CXX", "g++"),
+                                  sanitize=False, compile_timeout=5, timeout=1, quiet=True)
+
+    def test_mixed_results_earn_exact_partial_credit(self):
+        selected = select_cases(None, ["basics.empty_default", "basics.typed_null"])
+        outcomes = [Outcome(0, "", "") for _ in range(3)]
+        outcomes += [Outcome(0, "\n".join(CASES["basics"]) + "\n", ""),
+                     Outcome(0, "PASS empty_default\n", ""), Outcome(1, "", "failed")]
+        with patch("autograder.execute", side_effect=outcomes):
+            report = grade(self.arguments(), selected)
+        self.assertEqual((report["score"], report["max_score"]), (2, 4))
+        self.assertEqual((report["passed"], report["failed"]), (1, 1))
+        self.assertEqual([t["score"] for t in report["tests"]], [2, 0])
+
+    def test_missing_registered_case_is_an_error(self):
+        outcomes = [Outcome(0, "", "") for _ in range(3)]
+        outcomes.append(Outcome(0, "empty_default\n", ""))
+        with patch("autograder.execute", side_effect=outcomes), self.assertRaises(GraderError):
+            grade(self.arguments(), select_cases(["basics"], None))
 
 
 class ProcessTests(unittest.TestCase):
