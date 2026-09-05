@@ -6,7 +6,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace cs106l {
+namespace lab {
 
 namespace detail {
 // TODO stubs abort so they also work in noexcept functions. Do not edit this helper.
@@ -178,4 +178,4 @@ shared_ptr<T> make_shared(Args&&... args) {
     detail::todo("S7 make_shared");
 }
 
-} // namespace cs106l / 命名空间 cs106l
+} // namespace lab / 命名空间 lab

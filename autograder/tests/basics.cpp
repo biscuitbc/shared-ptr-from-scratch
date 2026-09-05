@@ -1,7 +1,7 @@
 #include "shared_ptr.h"
 #include "test.hpp"
 
-using cs106l::shared_ptr;
+using lab::shared_ptr;
 using lab_test::Tracked;
 
 TEST(empty_default) {
