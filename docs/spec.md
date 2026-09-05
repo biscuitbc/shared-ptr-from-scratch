@@ -2,7 +2,7 @@
 
 ## English
 
-This document defines the grading contract for the lab's C++20 subset. The behavioral references are the C++ working draft sections on [shared ownership](https://eel.is/c++draft/util.smartptr.shared), [constructors](https://eel.is/c++draft/util.smartptr.shared.const), [observers](https://eel.is/c++draft/util.smartptr.shared.obs), and [modifiers](https://eel.is/c++draft/util.smartptr.shared.mod). No latest-draft feature beyond the stated C++20 interface is required.
+This document defines the grading contract for the lab's C++20 subset. The teaching structure is inspired by [Stanford CS106L Assignment 7](https://github.com/cs106l/cs106l-assignments/tree/main/assignment7). The behavioral references are the C++ working draft sections on [shared ownership](https://eel.is/c++draft/util.smartptr.shared), [constructors](https://eel.is/c++draft/util.smartptr.shared.const), [observers](https://eel.is/c++draft/util.smartptr.shared.obs), and [modifiers](https://eel.is/c++draft/util.smartptr.shared.mod). No latest-draft feature beyond the stated C++20 interface is required.
 
 ### Scope and preconditions
 
@@ -95,7 +95,7 @@ Manage nodes only with the lab's smart pointer. The node definition and `print_l
 
 ## 中文
 
-本文定义本实验的评分契约。教学结构参考 [CS106L Assignment 7](https://github.com/cs106l/cs106l-assignments/tree/main/assignment7)，
+本文定义本实验的评分契约。教学结构参考 [Stanford CS106L Assignment 7](https://github.com/cs106l/cs106l-assignments/tree/main/assignment7)，
 共享所有权语义参考 C++ 工作草案的 [shared_ptr 定义](https://eel.is/c++draft/util.smartptr.shared)。
 我们只要求下述子集；不要求实现工作草案的所有成员或最新语言特性。
 

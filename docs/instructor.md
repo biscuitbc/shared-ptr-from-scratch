@@ -39,7 +39,7 @@ The [contract](spec.md) is authoritative for teaching-specific choices: separate
 
 ### Provenance
 
-The staged implementation/application/short-answer format was inspired by [CS106L Assignment 7](https://github.com/cs106l/cs106l-assignments/tree/main/assignment7). The implementation, tests and bilingual documentation here are independently written, use namespace `lab`, and are not an official course assignment. Smart-pointer behavioral sources are linked in the contract.
+This lab draws on [Stanford CS106L Assignment 7](https://github.com/cs106l/cs106l-assignments/tree/main/assignment7), retaining its implementation/application/short-answer format and adapting the original `unique_ptr` exercise to `shared_ptr`. The code uses namespace `lab`. Smart-pointer behavioral sources are linked in the contract.
 
 ---
 
@@ -82,4 +82,4 @@ python3 instructor/package.py --output dist/shared-pointer-lab.zip
 
 ### 参考来源
 
-“实现、应用、简答题”的阶段结构参考 [CS106L Assignment 7](https://github.com/cs106l/cs106l-assignments/tree/main/assignment7)。本仓库代码、测试和双语文档独立编写，使用 `lab` 命名空间，不是官方课程作业。智能指针语义的参考来源见接口契约。
+本实验参考 [Stanford CS106L Assignment 7](https://github.com/cs106l/cs106l-assignments/tree/main/assignment7)，沿用“实现、应用、简答题”的阶段结构，将原作业的 `unique_ptr` 练习改为 `shared_ptr`。代码使用 `lab` 命名空间。智能指针语义的参考来源见接口契约。

@@ -2,7 +2,7 @@
 
 ## English
 
-Build a small C++20 `lab::shared_ptr<T>` from scratch, then use it to build linked lists with shared tails. This independent lab follows a staged assignment format: implementation, application, and short answers. It is not affiliated with Stanford or any course.
+This lab is inspired by [Stanford CS106L Assignment 7](https://github.com/cs106l/cs106l-assignments/tree/main/assignment7), following its staged format of implementation, application, and short answers. It adapts the original `unique_ptr` exercise to shared ownership: build a small C++20 `lab::shared_ptr<T>` from scratch, then use it to build linked lists with shared tails.
 
 ### Learning goals
 
@@ -98,7 +98,7 @@ Pass both runs and complete the short answers. Tests cannot prove an arbitrary p
 
 ## 中文
 
-从零实现一个小型 C++20 `lab::shared_ptr<T>`，再用它构建共享尾部的链表。本实验独立编写，采用“实现、应用、简答题”的分阶段作业结构，与 Stanford 或任何课程均无隶属关系。
+本实验参考 [Stanford CS106L Assignment 7](https://github.com/cs106l/cs106l-assignments/tree/main/assignment7)，沿用“实现、应用、简答题”的分阶段作业结构，将原作业的 `unique_ptr` 主题扩展为共享所有权。你将从零实现一个小型 C++20 `lab::shared_ptr<T>`，再用它构建共享尾部的链表。
 
 ### 学习目标
 
