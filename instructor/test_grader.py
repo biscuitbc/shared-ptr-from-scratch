@@ -11,12 +11,14 @@ import shutil
 import sys
 import tempfile
 import unittest
+import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "autograder"))
 from autograder import (GraderError, OUTPUT_LIMIT, execute, positive_seconds,
                         select_cases, write_report)
 from cases import CASES, REJECTED_PROGRAMS
+from package import PUBLIC_FILES, package
 
 
 class InventoryTests(unittest.TestCase):
@@ -147,6 +149,35 @@ class RunnerTests(unittest.TestCase):
         ran, report = self.run_fixture(options=["--case", "not_a_real_case"])
         self.assertEqual(ran.returncode, 2)
         self.assertEqual(report["status"], "infrastructure_error")
+
+
+class PackagingTests(unittest.TestCase):
+    def test_archive_allowlist_and_no_overwrite(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            output = Path(temporary) / "student.zip"
+            package(ROOT, output)
+            with zipfile.ZipFile(output) as archive:
+                names = archive.namelist()
+                self.assertEqual(set(names), {"shared-pointer-lab/" + p for p in PUBLIC_FILES})
+                self.assertFalse(any("/instructor/" in n or "/build/" in n or "/.git/" in n for n in names))
+                self.assertIn(b"STUDENT TODO", archive.read("shared-pointer-lab/shared_ptr.h"))
+            before = output.read_bytes()
+            with self.assertRaises(FileExistsError):
+                package(ROOT, output)
+            self.assertEqual(output.read_bytes(), before)
+
+    def test_changed_starter_is_not_distributed(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary) / "source"
+            for name in (*PUBLIC_FILES, "instructor/starter.sha256"):
+                target = root / name
+                target.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copyfile(ROOT / name, target)
+            (root / "shared_ptr.h").write_text("altered source\n", encoding="utf-8")
+            output = Path(temporary) / "student.zip"
+            with self.assertRaises(ValueError):
+                package(root, output)
+            self.assertFalse(output.exists())
 
 
 class AllocationHarnessTests(unittest.TestCase):

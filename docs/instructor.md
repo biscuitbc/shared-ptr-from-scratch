@@ -29,7 +29,7 @@ Also validate that plausible incorrect implementations fail: missing copy increm
 python3 instructor/package.py --output dist/shared-pointer-lab.zip
 ```
 
-The package uses an explicit allowlist, includes the starter, docs, Makefile and public tests, and excludes `.git`, build output, reports, private solutions and instructor tools. The command refuses to overwrite an existing archive or package filled-in TODOs. Inspect the archive before distribution. The source repository's `make verify` target is a maintainer command and is not included as a usable workflow in the student archive.
+The package uses an explicit allowlist, includes the starter, docs, Makefile and public tests, and excludes `.git`, build output, reports, private solutions and instructor tools. It verifies the three student files against `instructor/starter.sha256` and refuses to package modified files or overwrite an existing archive. After intentionally revising a pristine starter, review the TODOs and update these fingerprints with `sha256sum shared_ptr.h main.cpp short_answer.txt`. Inspect the archive before distribution. The source repository's `make verify` target is a maintainer command and is not included as a usable workflow in the student archive.
 
 ### Manual review
 
@@ -72,7 +72,7 @@ python3 -m unittest discover -s instructor -p 'test_grader.py' -v
 python3 instructor/package.py --output dist/shared-pointer-lab.zip
 ```
 
-打包使用明确白名单，包含骨架、文档、Makefile 和公开测试，排除 `.git`、构建结果、报告、私有解答和教师工具。命令拒绝覆盖已有压缩包，也拒绝打包已填完的 TODO。发布前检查压缩包。源仓库中的 `make verify` 是维护命令，学生包不提供该工作流。
+打包使用明确白名单，包含骨架、文档、Makefile 和公开测试，排除 `.git`、构建结果、报告、私有解答和教师工具。它会用 `instructor/starter.sha256` 核对三个学生文件，拒绝打包已修改文件或覆盖已有压缩包。维护者有意修改原始骨架后，应检查 TODO，并使用 `sha256sum shared_ptr.h main.cpp short_answer.txt` 更新指纹。发布前检查压缩包。源仓库中的 `make verify` 是维护命令，学生包不提供该工作流。
 
 ### 人工检查
 
