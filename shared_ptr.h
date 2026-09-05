@@ -120,6 +120,9 @@ public:
         detail::todo("S6 reset pointer");
     }
 
+    // 已提供：清空请用 reset()；有类型的空指针仍可传给 reset(T*)。
+    void reset(std::nullptr_t) = delete;
+
     void swap(shared_ptr& other) noexcept {
         // STUDENT TODO [S6]: 交换整个所有权状态；不分配、不销毁对象、不改计数。
         (void)other;
