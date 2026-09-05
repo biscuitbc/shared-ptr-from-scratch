@@ -44,7 +44,7 @@ CASES = {
     "application": {
         "empty": "S8: empty values and tail / 空值序列和空尾部",
         "order": "S8: preserve order and counts / 保持顺序及计数",
-        "strings": "S8: generic value type / 泛型值类型",
+        "strings": "S8: strings and copy-only value types / 字符串及只能复制的值类型",
         "identity": "S8: share the exact tail and its counter / 共享原尾部及控制块",
         "empty_with_tail": "S8: return existing tail for empty values / 空序列返回已有尾部",
         "shared_lifetime": "S8: release only unshared prefix / 只释放不再共享的前缀",

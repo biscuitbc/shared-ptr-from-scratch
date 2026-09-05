@@ -11,7 +11,9 @@ struct ListNode {
     T value;
     lab::shared_ptr<ListNode<T>> next;
 
-    explicit ListNode(T value) : value(std::move(value)), next(nullptr) {}
+    // Copy when moving is unavailable or may throw; support copy-only value types.
+    // 移动不可用或可能抛异常时使用复制，支持只能复制的值类型。
+    explicit ListNode(T value) : value(std::move_if_noexcept(value)), next(nullptr) {}
 };
 
 // Build a fresh prefix in values order, sharing tail without copying its nodes.

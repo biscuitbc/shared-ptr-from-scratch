@@ -37,6 +37,18 @@ TEST(strings) {
     auto p = create_list(words);
     CHECK(values_of(p) == words);
     CHECK(words[0].empty() && words[1].size() == 300);
+    struct CopyOnly {
+        int value;
+        explicit CopyOnly(int n) : value(n) {}
+        CopyOnly(const CopyOnly&) = default;
+        CopyOnly(CopyOnly&&) = delete;
+    };
+    std::vector<CopyOnly> values;
+    values.emplace_back(4);
+    values.emplace_back(5);
+    auto copy_only = create_list(values);
+    CHECK(copy_only->value.value == 4 && copy_only->next->value.value == 5);
+    CHECK(!copy_only->next->next && values[0].value == 4);
 }
 
 TEST(identity) {
