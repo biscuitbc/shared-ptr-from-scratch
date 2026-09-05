@@ -88,9 +88,12 @@ TEST(factory_control_alloc_failure) {
 
 TEST(no_alloc_operations) {
     shared_ptr<Tracked> a(new Tracked(1)), b(new Tracked(2));
+    shared_ptr<Tracked> reset_last(new Tracked(3)), destroy_last(new Tracked(4));
     shared_ptr<int> null(static_cast<int*>(nullptr));
     {
         FailAfter fail(0);
+        auto last_owner = std::move(destroy_last);
+        reset_last.reset();
         shared_ptr<Tracked> empty, literal = nullptr;
         auto copy = a;
         auto moved = std::move(copy);
@@ -106,5 +109,5 @@ TEST(no_alloc_operations) {
         auto null_copy = null;
         CHECK(!null_copy && null_copy.use_count() == 2);
     }
-    CHECK(Tracked::destroyed == 0 && null.use_count() == 1);
+    CHECK(Tracked::destroyed == 2 && null.use_count() == 1);
 }
