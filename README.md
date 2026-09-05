@@ -37,7 +37,7 @@ The grader rebuilds from source on every run. Each case executes in a separate p
 | `main.cpp` | Implement S8, `create_list`. |
 | `short_answer.txt` | Answer eight questions in your own words, once per question in either language. |
 
-Preserve the public signatures and provided helpers. Do not edit the tests to earn points. `autograder/` contains public tests; `docs/` contains instructions; `instructor/` contains reference solutions and framework checks. Instructors should distribute a student package that excludes `instructor/`.
+Preserve the public signatures and provided helpers. Do not edit the tests to earn points. `autograder/` contains public tests; `docs/` contains instructions; `instructor/` contains framework checks only. Complete solutions are not included. Instructors may supply an external private solution for verification.
 
 ### Part 1: Implement shared ownership
 
@@ -133,7 +133,7 @@ python3 autograder/autograder.py --sanitize --json build/results.json
 | `main.cpp` | 完成 S8 的 `create_list`。 |
 | `short_answer.txt` | 用自己的话回答八道简答题，每题用任一语言回答一次即可。 |
 
-保留公开签名和已提供的辅助代码。不要通过修改测试来取得分数。`autograder/` 是公开测试，`docs/` 是实验说明，`instructor/` 是参考解和框架自检。教师应发布排除 `instructor/` 的学生包。
+保留公开签名和已提供的辅助代码。不要通过修改测试来取得分数。`autograder/` 是公开测试，`docs/` 是实验说明，`instructor/` 仅包含框架自检，不提供完整解答。教师可提供仓库外的私有实现用于验证。
 
 ### Part 1：实现共享所有权
 

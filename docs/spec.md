@@ -1,10 +1,105 @@
-# 接口契约
+# Interface contract / 接口契约
+
+## English
+
+This document defines the grading contract for the lab's C++20 subset. The behavioral references are the C++ working draft sections on [shared ownership](https://eel.is/c++draft/util.smartptr.shared), [constructors](https://eel.is/c++draft/util.smartptr.shared.const), [observers](https://eel.is/c++draft/util.smartptr.shared.obs), and [modifiers](https://eel.is/c++draft/util.smartptr.shared.mod). No latest-draft feature beyond the stated C++20 interface is required.
+
+### Scope and preconditions
+
+- Use namespace `lab`, type `shared_ptr<T>`, and alias `element_type = T`.
+- `T` is a non-array object type. It may be const, noncopyable, immovable, non-default-constructible, or over-aligned.
+- Recursive node declarations may mention incomplete `T`; `T` must be complete wherever an object is constructed or deleted.
+- Reject array, reference, void, and function specializations. Use scalar `new/delete`.
+- Only same-type copy/move ownership is required. Cross-type conversions, aliasing, custom deleters, allocators, weak pointers, `enable_shared_from_this`, comparisons, and thread safety are out of scope.
+- A raw pointer must be null or refer to a single object from `new` for which `delete T*` is valid. Never pass a stack address, array, freed pointer, or non-null pointer already owned by any ownership group.
+- The raw constructor takes `T*`, not the standard library's templated `Y*`. Dynamic-type-aware deletion is not implemented: do not adopt a derived object through a base with a nonvirtual destructor.
+- Object destructors must not throw. Dereference and arrow require a non-null stored pointer.
+- Reference counts are ordinary integers, used only on one thread, and fit in `long`.
+
+The grader must not exercise undefined behavior on a correct implementation. In particular, it must not use `p.reset(p.get())`, create a second ownership group from `p.get()`, dereference null, delete an object twice, or explicitly destroy a local handle that will later be destroyed automatically.
+
+### Ownership states
+
+A control block is shared dynamic storage containing at least a reference count; students choose its layout. Without a block there is no ownership. With a block, each owning handle contributes one share. Since aliasing is absent, handles in one group store the same pointer.
+
+| Independent expression | `get()` | `use_count()` | `bool` |
+| --- | --- | ---: | --- |
+| `shared_ptr<int>{}` | `nullptr` | 0 | false |
+| `shared_ptr<int>{nullptr}` | `nullptr` | 0 | false |
+| `shared_ptr<int>{new int(7)}` | Object address | 1 | true |
+| `shared_ptr<int>{static_cast<int*>(nullptr)}` | `nullptr` | 1 | false |
+
+The raw-pointer constructor creates an ownership group even for a typed null pointer. Literal `nullptr` selects the `std::nullptr_t` overload. Destruction and copying must therefore use ownership state, not just a pointer-null check.
+
+Default/literal-null construction, copying, moving, observers, `reset()`, and `swap` must not allocate dynamically. The raw-pointer constructor creates a dynamic control block. Allocate the object and control block separately.
+
+### Public interface
+
+Preserve all signatures, `explicit`, `const`, `noexcept`, and provided type restrictions in `shared_ptr.h`. Private fields and helpers may be added. Avoid unrelated public API additions.
+
+| Interface | Required behavior |
+| --- | --- |
+| `shared_ptr() noexcept` | Default-empty, no allocation |
+| `shared_ptr(std::nullptr_t) noexcept` | Default-empty; implicit initialization from nullptr allowed |
+| `explicit shared_ptr(T*)` | Adopt with count 1; delete input and propagate allocation failure |
+| `~shared_ptr() noexcept` | Release one share; at zero delete both object and block |
+| `shared_ptr(const shared_ptr&) noexcept` | Share and increment; copying empty ownership stays empty |
+| `operator=(const shared_ptr&) noexcept` | Acquire one source share and release old ownership; return `*this` |
+| `shared_ptr(shared_ptr&&) noexcept` | Transfer without incrementing; leave source default-empty |
+| `operator=(shared_ptr&&) noexcept` | Transfer and release old ownership; return `*this`; preserve self-moves |
+| `T* get() const noexcept` | Return stored pointer |
+| `T& operator*() const noexcept` | Return object reference; require non-null |
+| `T* operator->() const noexcept` | Return stored pointer; require non-null |
+| `long use_count() const noexcept` | Shared count, or 0 without a block |
+| `explicit operator bool() const noexcept` | `get() != nullptr`; no implicit bool/integer conversion |
+| `void reset() noexcept` | Release ownership and become default-empty |
+| `void reset(T*)` | Equivalent to `shared_ptr(ptr).swap(*this)`; strong exception guarantee |
+| `void swap(shared_ptr&) noexcept` | Exchange complete states without changing group counts |
+| Nonmember `swap` | Provided; support ADL through member swap |
+| `make_shared<T>(Args&&...)` | Perfect-forward, value-initialize `T`, return count 1 |
+
+The provided deleted `reset(std::nullptr_t)` overload means clearing is written `p.reset()`, not `p.reset(nullptr)`. The standard template `reset(Y*)` cannot deduce `Y` from literal nullptr either. `reset(static_cast<T*>(nullptr))` does create a new group with count 1.
+
+A `const shared_ptr<int>` still permits modifying the integer. A `shared_ptr<const int>` prevents modification through the handle; conversion from `shared_ptr<int>` is not required.
+
+### Assignment boundaries
+
+Self-copy and self-move preserve the address, count, and value. Distinct handles in one group are not the same object. If `a` and `b` are the only two owners, `a = std::move(b)` leaves `a.use_count() == 1` and `b.use_count() == 0`.
+
+Support sources that are members of the currently owned object, including `p = p->next` and `p = std::move(p->next)`. Releasing old ownership can destroy the source member. Acquire a safe new state before releasing the old object, and do not read the destroyed member afterwards. A temporary handle and a state exchange can help organize this ordering.
+
+Copy, move, observers, and swap have constant bookkeeping cost. The managed object's own destructor cost is excluded; releasing a list may recursively destroy many nodes.
+
+### Exception safety
+
+If control-block allocation fails in `shared_ptr<T>(raw)`, delete `raw` and propagate the exception. A failed constructor does not run that handle's destructor.
+
+If new block allocation fails in `p.reset(raw)`, delete the new object and preserve the old addresses, values, and counts for `p` and all its peers.
+
+`make_shared` must handle object allocation failure, object constructor failure, and control-block failure after successful object construction. Propagate the original exception and release resources acquired so far. The lab requires a simple separate-allocation implementation; combined allocation is outside this contract. This makes the second allocation failure deterministic to test. Common `std::make_shared` implementations combine allocations, so allocation behavior is intentionally different.
+
+### Linked-list application
+
+For `create_list(const std::vector<T>& values, shared_ptr<ListNode<T>> tail = nullptr)`:
+
+- `T` is copy-constructible and `tail` is finite and acyclic.
+- Allocate fresh nodes only for values, preserve order, and do not mutate the input vector.
+- The final new node's `next.get()` equals the original `tail.get()` and shares its control block.
+- Empty values return the existing tail; an empty tail with nonempty values yields an ordinary list.
+- Do not mutate, copy, or create cycles in tail nodes.
+- If prefix construction throws, release the partial prefix and preserve the caller's original values and tail.
+
+Manage nodes only with the lab's smart pointer. The node definition and `print_list` are provided. Tests check values, identity, ownership counts, lifetime, and exception cleanup.
+
+---
+
+## 中文
 
 本文定义本实验的评分契约。教学结构参考 [CS106L Assignment 7](https://github.com/cs106l/cs106l-assignments/tree/main/assignment7)，
 共享所有权语义参考 C++ 工作草案的 [shared_ptr 定义](https://eel.is/c++draft/util.smartptr.shared)。
 我们只要求下述子集；不要求实现工作草案的所有成员或最新语言特性。
 
-## 范围和前置条件
+### 范围和前置条件
 
 - 使用 C++20；命名空间 `lab`；类型 `shared_ptr<T>`；别名 `element_type = T`。
 - `T` 是非数组对象类型，可以是 `const U`，可以不可复制、不可移动、不可默认构造，也可过度对齐。
@@ -19,7 +114,7 @@
 以下行为违反前置条件，不属于测试对象：`p.reset(p.get())`、用 `p.get()` 新建独立所有权组、空指针解引用、对同一对象重复 `delete`。
 框架不得用这些未定义行为来“验证”正确实现，也不得手动析构一个之后仍会自动析构的局部句柄。
 
-## 所有权状态与空指针
+### 所有权状态与空指针
 
 控制块是共享的动态存储，至少包含引用计数；具体布局由学生决定。
 没有控制块的状态为“空所有权”。有控制块时，每个所有者各贡献 1 次计数。
@@ -38,7 +133,7 @@
 默认/字面量空构造、复制、移动、观察器、`reset()` 和 `swap` 不得动态分配内存。
 裸指针构造必须动态创建控制块；对象和控制块分开分配。
 
-## 公开接口
+### 公开接口
 
 保留 `shared_ptr.h` 中的函数签名、`explicit`、`const`、`noexcept` 和已提供的类型限制。
 可增加私有字段和私有辅助函数，不增加完成作业所不需要的公开 API。
@@ -71,7 +166,7 @@
 按照 [观察器接口](https://eel.is/c++draft/util.smartptr.shared.obs)，`const shared_ptr<int>` 仍允许修改所指整数。
 `shared_ptr<const int>` 才限制对所指对象的修改，不要求从 `shared_ptr<int>` 转换构造它。
 
-## 赋值的边界
+### 赋值的边界
 
 自复制和自移动必须保持地址、计数及对象值不变。两个不同的句柄即使属于同一组，也不等于自赋值。
 若原来 `a`、`b` 共同持有一个计数为 2 的对象，则 `a = std::move(b)` 后 `a.use_count() == 1`、`b.use_count() == 0`。
@@ -82,7 +177,7 @@
 
 复制/移动/观察器/交换应为 O(1)。释放最后一个对象时，其自身析构的时间不计在句柄操作的常数开销内；链表析构可能递归释放多个节点。
 
-## 异常安全
+### 异常安全
 
 `shared_ptr<T>(raw)` 中，若控制块分配失败，构造函数必须 `delete raw` 并重抛。
 失败的构造不会调用该句柄的析构函数，所以不能依靠析构补救。
@@ -95,7 +190,7 @@
 本实验要求简单的“两次分配”实现，不要求也不允许为通过此实验改变为单块合并分配；这使控制块分配失败能够被确定地注入测试。
 标准库的 `make_shared` 常采用合并分配优化，本实验不宣称相同的分配行为。
 
-## 链表应用
+### 链表应用
 
 `create_list(const std::vector<T>& values, shared_ptr<ListNode<T>> tail = nullptr)`：
 
